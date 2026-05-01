@@ -7,18 +7,22 @@ from selenium.webdriver.support import expected_conditions as EC
 
 options = Options()
 options.add_argument("--start-maximized")
-# options.add_argument(r"user-data-dir=C:\Users\YourUserName\AppData\Local\Google\Chrome\User Data")
-# options.add_argument("--profile-directory=Default")
 
 driver = webdriver.Chrome(options=options)
-driver.get("https://www.google.com")
+driver.get("https://duckduckgo.com/")
 
-wait = WebDriverWait(driver, 10)
-search_box = wait.until(EC.element_to_be_clickable((By.NAME, "q")))
-search_box.send_keys("bro code" + Keys.ENTER)
+wait = WebDriverWait(driver, 15)
 
-link = driver.find_element(By.PARTIAL_LINK_TEXT, "Bro code")
-link.click()
+# Use XPath to locate any visible input[type='text']
+search_box = wait.until(EC.element_to_be_clickable((By.XPATH, "//input[@type='text' and @name='q']")))
+
+search_box.send_keys("smily emoji" + Keys.ENTER)
+links = driver.find_element(By.PARTIAL_LINK_TEXT, "Smiley")
+links.click()
+
+# results
+results = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "a.result__a")))
+print(f"Found {len(results)} results.")
 
 input("Press Enter to close the browser...")
 driver.quit()

@@ -2,63 +2,77 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 import time
 
-driver = webdriver.Chrome()
-driver.get("https://www.rozee.pk/job/jsearch/q/python/fpn/20")
-# https://www.rozee.pk/job/jsearch/q/python/fpn/20
-# https://www.rozee.pk/job/jsearch/q/python/fpn/40
-time.sleep(5)
+search = input()
+def scrape_jobs():
+    driver = webdriver.Chrome()
 
-html = driver.page_source
-soup = BeautifulSoup(html, "lxml")
-jobs = soup.find_all("div", class_="job")
+    driver.get(f"https://www.rozee.pk/job/jsearch/q/{search}/fpn/0")
 
-for job in jobs:
+    time.sleep(5)
 
-    title_tag = job.find("h3", class_="s-18")
-    if not title_tag:
-        continue
+    html = driver.page_source
+    soup = BeautifulSoup(html, "lxml")
+    jobs = soup.find_all("div", class_="job")
 
-    title = title_tag.get_text(strip=True)
+    all_jobs = []
 
-    company_tag = job.find('div', class_='cname')
-    if company_tag:
-        company = company_tag.get_text(" ", strip=True)
-    else:
-        company = "N/A"
+    for job in jobs:
 
-    desc_tag = job.find('div', class_='jbody')
-    if desc_tag:
-        description = desc_tag.get_text(strip=True)
-    else:
-        description = "N/A"
+        title_tag = job.find("h3", class_="s-18")
+        if not title_tag:
+            continue
 
-    posted_tag = job.find('span', {'data-original-title': 'Posted On'})
-    if posted_tag:
-        posted = posted_tag.get_text(strip=True)
-    else:
-        posted = "N/A"
+        title = title_tag.get_text(strip=True)
 
-    exp_tag = job.find('span', {'data-original-title': 'Experience'})
-    if exp_tag:
-        experience = exp_tag.get_text(strip=True)
-    else:
-        experience = "N/A"
+        company_tag = job.find('div', class_='cname')
+        if company_tag:
+            company = company_tag.get_text(" ", strip=True)
+        else:
+            company = "N/A"
 
-    salary_tag = job.find('span', {'data-original-title': 'Offer Salary - PKR'})
-    if salary_tag:
-        salary = salary_tag.get_text(strip=True)
-    else:
-        salary = "N/A"
+        desc_tag = job.find('div', class_='jbody')
+        if desc_tag:
+            description = desc_tag.get_text(strip=True)
+        else:
+            description = "N/A"
 
-    link = "https:" + title_tag.a['href']
+        posted_tag = job.find('span', {'data-original-title': 'Posted On'})
+        if posted_tag:
+            posted = posted_tag.get_text(strip=True)
+        else:
+            posted = "N/A"
 
-    print(title)
-    print(company)
-    print(description)
-    print(posted)
-    print(experience)
-    print(salary)
-    print(link)
-    print("--------------------------------------------------")
+        exp_tag = job.find('span', {'data-original-title': 'Experience'})
+        if exp_tag:
+            experience = exp_tag.get_text(strip=True)
+        else:
+            experience = "N/A"
 
-driver.quit()
+        salary_tag = job.find('span', {'data-original-title': 'Offer Salary - PKR'})
+        if salary_tag:
+            salary = salary_tag.get_text(strip=True)
+        else:
+            salary = "N/A"
+
+        link = "https:" + title_tag.a['href']
+
+        all_jobs.append({
+            "title": title,
+            "company": company,
+            "description": description,
+            "posted": posted,
+            "experience": experience,
+            "salary": salary,
+            "link": link
+        })
+
+    driver.quit()
+    return all_jobs
+
+
+# For testing only — remove this when using in API
+if __name__ == "__main__":
+    data = scrape_jobs()
+    for job in data:
+        print(job)
+        print("-------------------------------------------------------")
